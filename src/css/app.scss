@@ -1,0 +1,149 @@
+
+:root {
+  --fs-display: 3.5rem;
+  --fs-title: 1.375rem;
+  --fs-body: 0.875rem;
+  --c-red: #e8413c;
+  --c-green: #3fae5a;
+  --c-white: #fff;
+  --c-black: #000;
+  --c-red-60: rgba(232, 65, 60, 0.6);
+  --c-red-20: rgba(232, 65, 60, 0.2);
+  --c-green-60: rgba(63, 174, 90, 0.6);
+  --c-green-20: rgba(63, 174, 90, 0.2);
+  --c-white-60: rgba(255, 255, 255, 0.6);
+  --c-white-20: rgba(255, 255, 255, 0.2);
+  --c-black-60: rgba(0, 0, 0, 0.6);
+  --c-black-20: rgba(0, 0, 0, 0.2);
+}
+
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+html {
+  touch-action: none;
+}
+html,
+body {
+  overscroll-behavior: none;
+}
+html,
+body,
+#q-app {
+  height: 100%;
+  overflow: hidden;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-xmas {
+  font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+  font-weight: 700;
+}
+
+.anim-float {
+  animation: anim-float 3s ease-in-out infinite;
+}
+@keyframes anim-float {
+  50% {
+    transform: translateY(-8%);
+  }
+}
+
+.anim-jelly {
+  animation: anim-jelly 2.4s ease-in-out infinite;
+}
+@keyframes anim-jelly {
+  0%,
+  40%,
+  100% {
+    transform: scale(1, 1);
+  }
+  8% {
+    transform: scale(1.12, 0.88);
+  }
+  16% {
+    transform: scale(0.92, 1.1) translateY(-6%);
+  }
+  24% {
+    transform: scale(1.04, 0.97);
+  }
+  32% {
+    transform: scale(0.99, 1.01);
+  }
+}
+
+.anim-wiggle {
+  animation: anim-wiggle 2.8s ease-in-out infinite;
+}
+@keyframes anim-wiggle {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+.anim-glow {
+  animation: anim-glow 2.4s ease-in-out infinite;
+}
+@keyframes anim-glow {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.anim-rise {
+  animation: anim-rise 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes anim-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.85);
+  }
+}
+
+.anim-pop {
+  animation: anim-pop 0.45s cubic-bezier(0.3, 1.8, 0.5, 1) both;
+}
+@keyframes anim-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+.chubby-btn {
+  border: 3px solid var(--c-black);
+  border-radius: 999px;
+  box-shadow:
+    0 5px 0 var(--c-black),
+    0 8px 14px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.12s cubic-bezier(0.3, 1.6, 0.5, 1),
+    box-shadow 0.12s;
+}
+.chubby-btn:active {
+  transform: translateY(4px) scale(1.03, 0.95);
+  box-shadow:
+    0 1px 0 var(--c-black),
+    0 3px 6px rgba(0, 0, 0, 0.35);
+}
+
+.dither-dots {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0.6px, transparent 0.9px);
+  background-size: 4px 4px;
+}
