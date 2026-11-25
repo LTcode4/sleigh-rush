@@ -15,6 +15,11 @@ const routes: RouteRecordRaw[] = [
         name: 'SleighPage',
         component: () => import('pages/SleighPage.vue'),
       },
+      {
+        path: 'game',
+        name: 'GamePage',
+        component: () => import('pages/GamePage.vue'),
+      },
     ],
   },
 
