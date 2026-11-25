@@ -8,7 +8,7 @@ module.exports = configure(() => ({
     errors: true,
   },
 
-  boot: [],
+  boot: ['axios', 'gtm', 'sentry', 'vconsole'],
 
   css: ['app.scss', 'tailwind.css'],
 
