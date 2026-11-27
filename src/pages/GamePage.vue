@@ -232,6 +232,7 @@ function trackGameOver(result: GameResult) {
   track('level_end', {
     score,
     distance: result.distance,
+    distance_km: result.distanceKm,
     delivered: result.delivered,
     wrong: result.wrong,
     missed: result.missed,

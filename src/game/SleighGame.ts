@@ -20,6 +20,7 @@ import {
 } from './dither';
 import { GiftShape } from './gifts';
 import { giftHoleFractions, iconSvg } from './icons';
+import { magicKm, magicKmh } from './milestones';
 import { QualitySettings, degrade } from './quality';
 import { sound } from './sound';
 import {
@@ -50,6 +51,7 @@ export interface ShapeStat {
 
 export interface GameResult {
   distance: number;
+  distanceKm: number;
   delivered: number;
   wrong: number;
   missed: number;
@@ -74,7 +76,7 @@ export interface TargetInfo {
 }
 
 export interface GameEvents {
-  onDistance?: (m: number) => void;
+  onDistance?: (km: number) => void;
   onSpeed?: (kmh: number) => void;
   onMistakes?: (n: number) => void;
   onDelivered?: (n: number) => void;
@@ -271,8 +273,6 @@ export class SleighGame {
   private travel = 0;
 
   private speed = 0;
-
-  private topSpeed = 0;
 
   private elapsed = 0;
 
@@ -512,7 +512,6 @@ export class SleighGame {
     this.over = false;
     this.travel = 0;
     this.speed = 0;
-    this.topSpeed = 0;
     this.elapsed = 0;
     this.mistakes = 0;
     this.delivered = 0;
@@ -904,12 +903,13 @@ export class SleighGame {
     sound.gameOver();
     this.events.onGameOver?.({
       distance: Math.round(this.travel * M_PER_UNIT),
+      distanceKm: Math.round(magicKm(this.elapsed) * 10) / 10,
       delivered: this.delivered,
       wrong: this.wrong,
       missed: this.missed,
       thrown: this.thrown,
       maxCombo: this.maxCombo,
-      topSpeed: Math.round(this.topSpeed * M_PER_UNIT * 3.6),
+      topSpeed: Math.round(magicKmh(this.elapsed)),
       time: this.elapsed,
       gifts: this.gifts.map((shape) => ({ shape, delivered: this.byShape[shape] ?? 0 })),
       order: [...this.order],
@@ -945,16 +945,15 @@ export class SleighGame {
     const diff = this.difficulty();
     const target = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * diff;
     this.speed += (target - this.speed) * Math.min(1, dt * 1.2);
-    this.topSpeed = Math.max(this.topSpeed, this.speed);
     this.travel += this.speed * dt;
     this.cooldown = Math.max(0, this.cooldown - dt);
 
-    const m = Math.floor(this.travel * M_PER_UNIT);
-    if (m !== this.shownDistance) {
-      this.shownDistance = m;
-      this.events.onDistance?.(m);
+    const km = Math.floor(magicKm(this.elapsed) * 10) / 10;
+    if (km !== this.shownDistance) {
+      this.shownDistance = km;
+      this.events.onDistance?.(km);
     }
-    const kmh = Math.round(this.speed * M_PER_UNIT * 3.6);
+    const kmh = Math.round(magicKmh(this.elapsed));
     if (kmh !== this.shownSpeed) {
       this.shownSpeed = kmh;
       this.events.onSpeed?.(kmh);
