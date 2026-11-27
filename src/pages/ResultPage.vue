@@ -54,7 +54,7 @@
             class="stat anim-rise flex flex-col items-center py-3"
             style="animation-delay: 0.45s">
             <span class="font-mono text-title font-bold leading-none">
-              {{ result.distance.toLocaleString() }}<span class="ml-0.5 text-body">m</span>
+              {{ formatBig(result.distanceKm ?? 0) }}<span class="ml-0.5 text-body">km</span>
             </span>
             <span class="mt-1.5 text-body text-white/60">距離</span>
           </div>
@@ -74,6 +74,17 @@
         </button>
       </div>
     </div>
+
+    <DropDialog v-model="showMilestone" closable>
+      <div class="flex flex-col items-center px-5 pb-6 pt-8 text-center">
+        <MilestoneEgg :distance-km="result.distanceKm ?? 0" :top-speed="result.topSpeed" />
+        <button
+          class="chubby-btn mt-5 w-full bg-red py-2.5 text-body font-black text-white"
+          @click="showMilestone = false">
+          太厲害了
+        </button>
+      </div>
+    </DropDialog>
   </q-page>
 </template>
 
@@ -81,12 +92,20 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import DottedMoon from 'components/DottedMoon.vue';
+import DropDialog from 'components/DropDialog.vue';
 import GiftRain from 'components/GiftRain.vue';
+import MilestoneEgg from 'components/MilestoneEgg.vue';
 import SleighPreview from 'components/SleighPreview.vue';
 import SnowFall from 'components/SnowFall.vue';
 import SnowTown from 'components/SnowTown.vue';
 import { useAppStore } from 'src/stores/app-store';
 import { scoreOf } from 'src/game/score';
+import {
+  DISTANCE_MILESTONES,
+  SPEED_MILESTONES,
+  formatBig,
+  reachedMilestone,
+} from 'src/game/milestones';
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -104,8 +123,19 @@ function onPagePointer(e: PointerEvent) {
   rainRef.value?.poke(e.clientX, e.clientY);
 }
 
+const hasMilestone = computed(() => {
+  const r = result.value;
+  if (!r) return false;
+  return (
+    !!reachedMilestone(DISTANCE_MILESTONES, r.distanceKm ?? 0) ||
+    !!reachedMilestone(SPEED_MILESTONES, r.topSpeed)
+  );
+});
+const showMilestone = ref(false);
+
 const shownScore = ref(0);
 let raf = 0;
+let milestoneTimer = 0;
 watch(showInfo, (v) => {
   if (!v) return;
   const target = score.value;
@@ -117,8 +147,16 @@ watch(showInfo, (v) => {
     if (t < 1) raf = requestAnimationFrame(tick);
   };
   raf = requestAnimationFrame(tick);
+  if (hasMilestone.value) {
+    milestoneTimer = window.setTimeout(() => {
+      showMilestone.value = true;
+    }, duration + 400);
+  }
 });
-onBeforeUnmount(() => cancelAnimationFrame(raf));
+onBeforeUnmount(() => {
+  cancelAnimationFrame(raf);
+  window.clearTimeout(milestoneTimer);
+});
 
 function retry() {
   router.replace({ name: 'GamePage', query: router.currentRoute.value.query });

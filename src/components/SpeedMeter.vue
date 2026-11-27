@@ -5,14 +5,14 @@
       class="distance"
       :viewBox="`0 0 ${distW} 40`"
       :style="{ width: `${distW / 16}rem` }"
-      :aria-label="`行駛距離 ${distance} 公尺`">
+      :aria-label="`行駛距離 ${distanceText} 公里`">
       <text class="d-shadow" :x="distW / 2" y="33">
         {{ distanceText }}
-        <tspan class="unit" dx="2">m</tspan>
+        <tspan class="unit" dx="2">km</tspan>
       </text>
       <text class="d-main" :x="distW / 2" y="29">
         {{ distanceText }}
-        <tspan class="unit" dx="2">m</tspan>
+        <tspan class="unit" dx="2">km</tspan>
       </text>
     </svg>
 
@@ -20,7 +20,7 @@
       v-if="show !== 'distance'"
       class="gauge"
       viewBox="0 0 80 46"
-      :aria-label="`時速 ${speed} 公里`">
+      :aria-label="`時速 ${speedText} 公里`">
       <path d="M4 42A36 36 0 0 1 76 42Z" class="g-face" />
       <circle
         v-for="(d, i) in GAUGE"
@@ -29,7 +29,7 @@
         :cy="d.y"
         :r="i < lit ? d.r : 0.75"
         :fill="i < lit ? d.c : 'var(--c-white-20)'" />
-      <text class="g-num" x="40" y="38">{{ speed }}</text>
+      <text class="g-num" x="40" y="38">{{ speedText }}</text>
       <text class="g-unit" x="40" y="45">km/h</text>
     </svg>
   </div>
@@ -37,13 +37,17 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { MAGIC_KMH_START, MAGIC_KMH_TOP, formatBig } from 'src/game/milestones';
 
 const props = defineProps<{ distance: number; speed: number; show?: 'distance' | 'speed' }>();
 
-const MAX_KMH = 120;
-
-const distanceText = computed(() => props.distance.toLocaleString());
-const distW = computed(() => 24 + distanceText.value.length * 17);
+const distanceText = computed(() => formatBig(props.distance));
+const speedText = computed(() => formatBig(Math.round(props.speed)));
+const distW = computed(() => {
+  const text = distanceText.value;
+  const wide = text.replace(/[\x20-\x7e]/g, '').length;
+  return 36 + text.length * 17 + wide * 17;
+});
 
 interface GaugeDot {
   x: number;
@@ -74,9 +78,10 @@ const GAUGE: GaugeDot[] = (() => {
   return dots.sort((p, q) => Math.atan2(42 - q.y, q.x - 40) - Math.atan2(42 - p.y, p.x - 40));
 })();
 
-const lit = computed(() =>
-  Math.round(Math.max(0, Math.min(1, props.speed / MAX_KMH)) * GAUGE.length),
-);
+const lit = computed(() => {
+  const t = Math.log(props.speed / MAGIC_KMH_START) / Math.log(MAGIC_KMH_TOP / MAGIC_KMH_START);
+  return props.speed > 0 ? Math.round(Math.max(0, Math.min(1, t)) * GAUGE.length) : 0;
+});
 </script>
 
 <style scoped>
